@@ -39,6 +39,14 @@ public class MainMenuFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // Lightweight one-shot entrance motion; no repeating animation on low-RAM devices.
+        view.setAlpha(0f);
+        view.setTranslationY(8f);
+        view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(180L)
+                .start();
         Button mNewsButton = view.findViewById(R.id.news_button);
         Button mDiscordButton = view.findViewById(R.id.discord_button);
         Button mCustomControlButton = view.findViewById(R.id.custom_control_button);
