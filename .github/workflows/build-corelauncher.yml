@@ -52,8 +52,29 @@ jobs:
           for density, size in sizes.items():
               d = root / f"mipmap-{density}"
               d.mkdir(parents=True, exist_ok=True)
-              src.resize((size,size), Image.Resampling.LANCZOS).save(d / "ic_launcher.png")
-              src.resize((size,size), Image.Resampling.LANCZOS).save(d / "ic_launcher_round.png")
+              icon = src.resize((size,size), Image.Resampling.LANCZOS)
+              icon.save(d / "ic_launcher.png")
+              icon.save(d / "ic_launcher_round.png")
+              icon.save(d / "ic_launcher_foreground.png")
+          # Adaptive icon XML takes priority on Android 8+; point it at the new logo.
+          adaptive = root / "mipmap-anydpi-v26"
+          adaptive.mkdir(parents=True, exist_ok=True)
+          (adaptive / "ic_launcher.xml").write_text(
+              '<?xml version="1.0" encoding="utf-8"?>\n'
+              '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
+              '  <background android:drawable="@color/corelauncher_icon_background"/>\n'
+              '  <foreground android:drawable="@mipmap/ic_launcher_foreground"/>\n'
+              '</adaptive-icon>\n')
+          (adaptive / "ic_launcher_round.xml").write_text(
+              '<?xml version="1.0" encoding="utf-8"?>\n'
+              '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
+              '  <background android:drawable="@color/corelauncher_icon_background"/>\n'
+              '  <foreground android:drawable="@mipmap/ic_launcher_foreground"/>\n'
+              '</adaptive-icon>\n')
+          values = root / "values"
+          values.mkdir(parents=True, exist_ok=True)
+          (values / "corelauncher_icon_colors.xml").write_text(
+              '<resources><color name="corelauncher_icon_background">#2878E8</color></resources>\n')
           # Also replace common legacy icon resources if the upstream manifest references them.
           for folder in ("drawable","drawable-nodpi"):
               d = root / folder
@@ -63,7 +84,11 @@ jobs:
                       if p.exists():
                           src.save(p)
           PY
-          echo "CoreLauncher icon resources generated."
+          sed -i 's#<string name="app_name">.*</string>#<string name="app_name">CoreLauncher</string>#' app_pojavlauncher/src/main/res/values/strings.xml
+          sed -i 's#<string name="app_short_name">.*</string>#<string name="app_short_name">CoreLauncher</string>#' app_pojavlauncher/src/main/res/values/strings.xml
+          grep -q '<string name="app_name">CoreLauncher</string>' app_pojavlauncher/src/main/res/values/strings.xml
+          grep -q '<string name="app_short_name">CoreLauncher</string>' app_pojavlauncher/src/main/res/values/strings.xml
+          echo "CoreLauncher app label and icon resources verified."
       - name: Build debug APK
         run: |
           set -euo pipefail
