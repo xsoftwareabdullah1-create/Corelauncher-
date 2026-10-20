@@ -1,0 +1,83 @@
+name: Build CoreLauncher APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'corelauncher-logo.svg'
+      - '.github/workflows/build-corelauncher.yml'
+      - 'app_pojavlauncher/**'
+      - 'gradle/**'
+      - 'settings.gradle'
+      - 'build.gradle'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install logo rendering tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin
+      - name: Apply CoreLauncher icon
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f corelauncher-logo.svg
+          test -f app_pojavlauncher/src/main/AndroidManifest.xml
+          rsvg-convert -w 512 -h 512 corelauncher-logo.svg -o /tmp/corelauncher.png
+          python3 -m pip install --user Pillow
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          src = Image.open("/tmp/corelauncher.png").convert("RGBA")
+          root = Path("app_pojavlauncher/src/main/res")
+          sizes = {"mdpi":48,"hdpi":72,"xhdpi":96,"xxhdpi":144,"xxxhdpi":192}
+          for density, size in sizes.items():
+              d = root / f"mipmap-{density}"
+              d.mkdir(parents=True, exist_ok=True)
+              src.resize((size,size), Image.Resampling.LANCZOS).save(d / "ic_launcher.png")
+              src.resize((size,size), Image.Resampling.LANCZOS).save(d / "ic_launcher_round.png")
+          # Also replace common legacy icon resources if the upstream manifest references them.
+          for folder in ("drawable","drawable-nodpi"):
+              d = root / folder
+              if d.exists():
+                  for name in ("pojavlauncher.png","ic_launcher.png","launcher_icon.png"):
+                      p = d / name
+                      if p.exists():
+                          src.save(p)
+          PY
+          echo "CoreLauncher icon resources generated."
+      - name: Build debug APK
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew --no-daemon :app_pojavlauncher:assembleDebug
+      - name: Prepare named APK
+        run: |
+          set -euo pipefail
+          APK="$(find app_pojavlauncher/build/outputs/apk/debug -type f -name '*.apk' | head -n 1)"
+          test -n "$APK"
+          mkdir -p dist
+          cp "$APK" dist/corelauncher.apk
+          ls -lh dist/corelauncher.apk
+      - name: Upload corelauncher.apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: corelauncher-apk
+          path: dist/corelauncher.apk
+          if-no-files-found: error
+          retention-days: 14
