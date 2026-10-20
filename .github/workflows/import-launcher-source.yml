@@ -1,8 +1,7 @@
 name: Import complete launcher source
 on:
+  # Manual only: importing upstream must not overwrite CoreLauncher branding or UI customizations.
   workflow_dispatch:
-  push:
-    branches: [main]
 permissions:
   contents: write
 jobs:
