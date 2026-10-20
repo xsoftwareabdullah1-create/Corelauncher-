@@ -18,7 +18,7 @@ jobs:
         run: |
           set -euo pipefail
           git clone --depth 1 --recurse-submodules --branch v3_openjdk https://github.com/PojavLauncherTeam/PojavLauncher.git /tmp/upstream
-          rsync -a --exclude='.git' --exclude='.github/workflows/**' /tmp/upstream/ ./
+          rsync -a --exclude='.git' --exclude='.github/' /tmp/upstream/ ./
           mkdir -p .github/workflows
           git add -A
           if git diff --cached --quiet; then
