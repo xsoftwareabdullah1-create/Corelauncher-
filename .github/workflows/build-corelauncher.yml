@@ -1,4 +1,5 @@
 name: Build CoreLauncher APK
+# Triggered by a commit to this workflow file; manual runs are also supported.
 on:
   workflow_dispatch:
   push:
