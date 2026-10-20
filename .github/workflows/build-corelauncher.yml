@@ -29,7 +29,7 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           tools: false
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
       - name: Install logo rendering tools
         run: |
           sudo apt-get update
