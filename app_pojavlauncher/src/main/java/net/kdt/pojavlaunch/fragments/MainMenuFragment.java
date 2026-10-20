@@ -6,7 +6,6 @@ import static net.kdt.pojavlaunch.Tools.shareLog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -40,11 +39,6 @@ public class MainMenuFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // Subtle, short entrance motion; avoid expensive looping effects on low-RAM devices.
-        view.setAlpha(0f);
-        view.setTranslationY(8f);
-        view.animate().alpha(1f).translationY(0f).setDuration(180L)
-                .setInterpolator(new DecelerateInterpolator()).start();
         Button mNewsButton = view.findViewById(R.id.news_button);
         Button mDiscordButton = view.findViewById(R.id.discord_button);
         Button mCustomControlButton = view.findViewById(R.id.custom_control_button);
