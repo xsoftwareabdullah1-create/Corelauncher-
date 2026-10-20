@@ -1,0 +1,39 @@
+name: Import complete launcher source
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Import full PojavLauncher Java and native source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --recurse-submodules --branch v3_openjdk https://github.com/PojavLauncherTeam/PojavLauncher.git /tmp/upstream
+          rsync -a --exclude='.git' /tmp/upstream/ ./
+          mkdir -p .github/workflows
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to import."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Import complete Java and native launcher source"
+          git push origin HEAD:main
+      - name: Verify important launcher files
+        run: |
+          set -euo pipefail
+          test -f settings.gradle
+          test -f app_pojavlauncher/src/main/AndroidManifest.xml
+          test -f app_pojavlauncher/src/main/jni/Android.mk
+          test -f app_pojavlauncher/build.gradle
+          echo "Launcher source files verified."
