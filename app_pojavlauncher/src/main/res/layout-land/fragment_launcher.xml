@@ -8,10 +8,21 @@
     android:background="@drawable/corelauncher_glass_background"
     android:padding="18dp">
 
+    <ImageView
+        android:id="@+id/corelauncher_logo"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:contentDescription="CoreLauncher"
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/corelauncher_brand" />
+
     <TextView
         android:id="@+id/corelauncher_brand"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:paddingStart="8dp"
         android:paddingTop="4dp"
         android:paddingBottom="12dp"
@@ -19,7 +30,7 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/corelauncher_logo"
         app:layout_constraintEnd_toStartOf="@id/launcher_right_panel"
         app:layout_constraintTop_toTopOf="parent" />
 
