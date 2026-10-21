@@ -123,14 +123,13 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix '.debug'
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.customDebug
-            resValue 'string', 'application_package', 'com.corelauncher.mobile.debug'
-            resValue 'string', 'storageProviderAuthorities', 'com.corelauncher.mobile.scoped.gamefolder.debug'
-            resValue 'string', 'shareProviderAuthority', 'com.corelauncher.mobile.scoped.controlfolder.debug'
+            resValue 'string', 'application_package', 'com.corelauncher.mobile'
+            resValue 'string', 'storageProviderAuthorities', 'com.corelauncher.mobile.scoped.gamefolder'
+            resValue 'string', 'shareProviderAuthority', 'com.corelauncher.mobile.scoped.controlfolder'
         }
         proguard {
             initWith debug
